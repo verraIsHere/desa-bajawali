@@ -4,17 +4,20 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { NavigationChevron } from '@/components/ui/NavigationChevron'
 import type { Profile, UserRole } from '@/types/database'
 import {
-  LayoutDashboard,
-  Newspaper,
-  Image as ImageIcon,
   Database,
-  Users,
-  User,
+  Globe2,
+  Image as ImageIcon,
+  Landmark,
+  LayoutDashboard,
   LogOut,
-  ChevronLeft,
   Menu,
+  Newspaper,
+  Sprout,
+  User,
+  Users,
   X,
 } from 'lucide-react'
 
@@ -37,10 +40,25 @@ const navItems: NavItem[] = [
     icon: <LayoutDashboard size={18} />,
   },
   {
+    label: 'Data Desa',
+    href: '/admin/data-desa',
+    icon: <Database size={18} />,
+    section: 'Konten',
+  },
+  {
+    label: 'Pemerintahan',
+    href: '/admin/pemerintahan',
+    icon: <Landmark size={18} />,
+  },
+  {
+    label: 'Potensi Desa',
+    href: '/admin/potensi',
+    icon: <Sprout size={18} />,
+  },
+  {
     label: 'Berita',
     href: '/admin/berita',
     icon: <Newspaper size={18} />,
-    section: 'Konten',
   },
   {
     label: 'Galeri',
@@ -48,11 +66,10 @@ const navItems: NavItem[] = [
     icon: <ImageIcon size={18} />,
   },
   {
-    label: 'Data Desa',
-    href: '/admin/data-desa',
-    icon: <Database size={18} />,
-    section: 'Data',
-    roles: ['owner', 'developer'],
+    label: 'Profil & Kontak',
+    href: '/admin/website',
+    icon: <Globe2 size={18} />,
+    section: 'Website',
   },
   {
     label: 'Pengguna',
@@ -145,7 +162,7 @@ export default function AdminSidebar({ profile }: SidebarProps) {
           className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-green-100/70 hover:bg-green-800/40 hover:text-white transition-colors"
         >
           <User size={18} />
-          Profil
+          Profil Saya
         </Link>
         <button
           onClick={handleLogout}
@@ -179,7 +196,7 @@ export default function AdminSidebar({ profile }: SidebarProps) {
           href="/"
           className="flex items-center gap-2 px-3 py-2 rounded-md text-xs text-green-400/50 hover:text-green-300 transition-colors"
         >
-          <ChevronLeft size={14} />
+          <NavigationChevron direction="previous" className="shrink-0" />
           Kembali ke Website
         </Link>
       </div>

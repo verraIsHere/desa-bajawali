@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { NavigationChevron } from "@/components/ui/NavigationChevron";
 
 export const metadata = {
   title: "Profil Desa Bajawali",
@@ -45,7 +45,11 @@ export default function ProfilIndexPage() {
               </p>
               <div className="flex justify-end">
                 <div className="w-10 h-10 rounded-full bg-paper-200 group-hover:bg-white flex items-center justify-center transition-colors">
-                  <ArrowRight size={20} className="text-ink-950 group-hover:text-green-800" />
+                  <NavigationChevron
+                    direction="next"
+                    size={20}
+                    className="text-ink-950 group-hover:text-green-800"
+                  />
                 </div>
               </div>
             </Link>

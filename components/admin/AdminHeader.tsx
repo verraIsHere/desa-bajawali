@@ -4,13 +4,18 @@ import { usePathname } from 'next/navigation'
 
 const breadcrumbMap: Record<string, string> = {
   '/admin': 'Dashboard',
+  '/admin/data-desa': 'Data Desa',
+  '/admin/pemerintahan': 'Pemerintahan',
+  '/admin/potensi': 'Potensi Desa',
   '/admin/berita': 'Berita',
   '/admin/berita/tambah': 'Tambah Berita',
   '/admin/galeri': 'Galeri',
   '/admin/galeri/tambah': 'Tambah Foto',
-  '/admin/data-desa': 'Data Desa',
+  '/admin/website': 'Profil & Website',
+  '/admin/website/hero': 'Hero Banner',
+  '/admin/website/kontak': 'Informasi Kontak',
   '/admin/pengguna': 'Pengguna',
-  '/admin/profil': 'Profil',
+  '/admin/profil': 'Profil Saya',
 }
 
 export default function AdminHeader() {

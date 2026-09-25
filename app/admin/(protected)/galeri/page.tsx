@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Plus, Pencil, ExternalLink } from 'lucide-react'
+import { Plus, Pencil } from 'lucide-react'
 import { getAllGallery } from '@/lib/queries/gallery'
 import StatusBadge from '@/components/admin/StatusBadge'
 import DeleteGalleryButton from './DeleteGalleryButton'

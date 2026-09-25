@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import { Upload, X, Image as ImageIcon, CheckCircle2 } from 'lucide-react'
+import { Upload, X, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import {
   compressImage,
@@ -141,6 +141,8 @@ export default function ImageUploader({
       {preview ? (
         /* Image Preview */
         <div className="relative rounded-lg overflow-hidden border border-paper-200 bg-paper-100">
+          {/* Preview memakai blob URL lokal sehingga tidak dapat dioptimalkan oleh next/image. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview}
             alt="Preview"

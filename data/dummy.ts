@@ -101,7 +101,7 @@ export const mataPencaharian = [
 export const beritaDummy = [
   {
     id: '1',
-    slug: 'penyerahan-hibah-motor',
+    slug: 'penyerahan-hibah-motor-kepada-umat-hindu-dan-umat-islam',
     title: 'Penyerahan Hibah Motor kepada Umat Hindu dan Umat Islam',
     category: 'Pemerintahan',
     date: '22 Sep 2026',
@@ -113,7 +113,7 @@ export const beritaDummy = [
   },
   {
     id: '2',
-    slug: 'penyerahan-bpjs-ketenagakerjaan',
+    slug: 'penyerahan-bpjs-ketenagakerjaan-kepada-pegawainsara',
     title: 'Penyerahan BPJS Ketenagakerjaan kepada Pegawainsara',
     category: 'Pemerintahan',
     date: '22 Sep 2026',
@@ -125,7 +125,7 @@ export const beritaDummy = [
   },
   {
     id: '3',
-    slug: 'sosialisasi-stdb',
+    slug: 'sosialisasi-surat-tanda-daftar-budidaya-std-b',
     title: 'Sosialisasi Surat Tanda Daftar Budidaya (STD-B)',
     category: 'Pertanian',
     date: '22 Sep 2026',
@@ -138,30 +138,31 @@ export const beritaDummy = [
 ]
 
 export const galeriDummy = [
-  {
-    id: '1',
-    url: '/gambar/galeri/galeri_1.webp',
-    caption: 'Peringatan Hari Ulang Tahun (Dirgahayu) RI ke-80',
-    category: 'Kegiatan Masyarakat',
-  },
-  {
-    id: '2',
-    url: '/gambar/galeri/galeri_2.webp',
-    caption: 'Penyerahan Bantuan Hibah Sepeda Motor untuk Umat Hindu',
-    category: 'Keagamaan',
-  },
-  {
-    id: '3',
-    url: '/gambar/galeri/galeri_3.webp',
-    caption: 'Penyerahan Bantuan Hibah Sepeda Motor untuk Umat Islam',
-    category: 'Keagamaan',
-  },
-  {
+   {
     id: '4',
     url: '/gambar/galeri/galeri_4.webp',
     caption: 'Foto Kebersamaan dan Dokumentasi Bersama Warga',
     category: 'Kegiatan Masyarakat',
   },
+  {
+    id: '1',
+    url: '/gambar/galeri/galeri_2.webp',
+    caption: 'Penyerahan Bantuan Hibah Sepeda Motor untuk Umat Hindu',
+    category: 'Keagamaan',
+  },
+  {
+    id: '2',
+    url: '/gambar/galeri/galeri_3.webp',
+    caption: 'Penyerahan Bantuan Hibah Sepeda Motor untuk Umat Islam',
+    category: 'Keagamaan',
+  },
+  {
+    id: '3',
+    url: '/gambar/galeri/galeri_1.webp',
+    caption: 'Peringatan Hari Ulang Tahun (Dirgahayu) RI ke-80',
+    category: 'Kegiatan Masyarakat',
+  },
+ 
   {
     id: '5',
     url: '/gambar/galeri/galeri_5.webp',

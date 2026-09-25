@@ -1,11 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import type { News } from '@/types/database'
 
+async function getClient() {
+  try {
+    return await createClient()
+  } catch {
+    return null
+  }
+}
+
 /**
  * Get published news for public pages, ordered by published_at desc
  */
 export async function getPublishedNews(): Promise<News[]> {
-  const supabase = await createClient()
+  const supabase = await getClient()
+  if (!supabase) return []
+
   const { data, error } = await supabase
     .from('news')
     .select('*, author:profiles(full_name)')
@@ -17,14 +27,16 @@ export async function getPublishedNews(): Promise<News[]> {
     return []
   }
 
-  return data as unknown as News[]
+  return (data || []) as unknown as News[]
 }
 
 /**
  * Get a single news article by slug (public — only published)
  */
 export async function getNewsBySlug(slug: string): Promise<News | null> {
-  const supabase = await createClient()
+  const supabase = await getClient()
+  if (!supabase) return null
+
   const { data, error } = await supabase
     .from('news')
     .select('*, author:profiles(full_name)')
@@ -44,7 +56,9 @@ export async function getNewsBySlug(slug: string): Promise<News | null> {
  * Get all news for admin CMS (includes drafts)
  */
 export async function getAllNews(): Promise<News[]> {
-  const supabase = await createClient()
+  const supabase = await getClient()
+  if (!supabase) return []
+
   const { data, error } = await supabase
     .from('news')
     .select('*, author:profiles(full_name)')
@@ -55,14 +69,16 @@ export async function getAllNews(): Promise<News[]> {
     return []
   }
 
-  return data as unknown as News[]
+  return (data || []) as unknown as News[]
 }
 
 /**
  * Get a single news by ID (admin — includes drafts)
  */
 export async function getNewsById(id: string): Promise<News | null> {
-  const supabase = await createClient()
+  const supabase = await getClient()
+  if (!supabase) return null
+
   const { data, error } = await supabase
     .from('news')
     .select('*, author:profiles(full_name)')
@@ -77,12 +93,13 @@ export async function getNewsById(id: string): Promise<News | null> {
   return data as unknown as News
 }
 
-
 /**
  * Get count of news articles
  */
 export async function getNewsCount(): Promise<number> {
-  const supabase = await createClient()
+  const supabase = await getClient()
+  if (!supabase) return 0
+
   const { count, error } = await supabase
     .from('news')
     .select('*', { count: 'exact', head: true })

@@ -1,11 +1,27 @@
 import Link from "next/link";
 import Image from "next/image";
+import { NavigationChevron } from "@/components/ui/NavigationChevron";
+import { getPublicVillageGeography, getPublishedPotentials } from '@/lib/queries/village';
 
 export const metadata = {
   title: "Potensi Desa Bajawali",
 };
 
-export default function PotensiPage() {
+export default async function PotensiPage() {
+  const [potentials, geography] = await Promise.all([
+    getPublishedPotentials(),
+    getPublicVillageGeography(),
+  ])
+  const agriculture = potentials.find((item) => item.slug === 'pertanian')
+  const umkm = potentials.find((item) => item.slug === 'umkm')
+  const pariwisata = potentials.find((item) => item.slug === 'pariwisata')
+  const perikanan = potentials.find((item) => item.slug === 'perikanan')
+  const sumberDayaAlam = potentials.find((item) => item.slug === 'sumber-daya-alam')
+  const area = geography.area_ha.toLocaleString('id-ID', {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+  })
+
   return (
     <div className="py-12 md:py-24">
       <div className="container mx-auto px-5 lg:px-8">
@@ -35,10 +51,10 @@ export default function PotensiPage() {
             <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
             <div className="absolute inset-0 p-8 flex flex-col justify-end">
               <span className="text-white/80 text-sm font-bold uppercase tracking-widest mb-3">01</span>
-              <h2 className="font-editorial text-4xl text-white mb-3">Pertanian</h2>
-              <p className="text-white/90 mb-6 max-w-md text-lg hidden md:block">Kelapa sawit sebagai komoditas andalan warga, ditopang 10 kelompok tani dan 1 Gapoktan.</p>
+              <h2 className="font-editorial text-4xl text-white mb-3">{agriculture?.title || 'Pertanian'}</h2>
+              <p className="text-white/90 mb-6 max-w-md text-lg hidden md:block">{agriculture?.description || 'Kelapa sawit sebagai komoditas andalan warga, ditopang 10 kelompok tani dan 1 Gapoktan.'}</p>
               <div className="text-sm font-semibold text-white flex items-center gap-2">
-                <span className="border-b border-white group-hover:border-transparent transition-colors">Lihat detail</span> <span className="transition-transform group-hover:translate-x-1">&rarr;</span>
+                <span className="border-b border-white group-hover:border-transparent transition-colors">Lihat detail</span> <span className="transition-transform group-hover:translate-x-1"><NavigationChevron direction="next" /></span>
               </div>
             </div>
           </Link>
@@ -54,9 +70,9 @@ export default function PotensiPage() {
             <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
             <div className="absolute inset-0 p-6 flex flex-col justify-end">
               <span className="text-white/80 text-xs font-bold uppercase tracking-widest mb-2">02</span>
-              <h2 className="font-editorial text-2xl text-white mb-3">UMKM & Kriya</h2>
+              <h2 className="font-editorial text-2xl text-white mb-3">{umkm?.title || 'UMKM & Kriya'}</h2>
               <div className="text-sm font-semibold text-white flex items-center gap-2">
-                <span className="border-b border-white group-hover:border-transparent transition-colors">Lihat detail</span> <span className="transition-transform group-hover:translate-x-1">&rarr;</span>
+                <span className="border-b border-white group-hover:border-transparent transition-colors">Lihat detail</span> <span className="transition-transform group-hover:translate-x-1"><NavigationChevron direction="next" /></span>
               </div>
             </div>
           </Link>
@@ -72,9 +88,9 @@ export default function PotensiPage() {
             <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
             <div className="absolute inset-0 p-6 flex flex-col justify-end">
               <span className="text-white/80 text-xs font-bold uppercase tracking-widest mb-2">03</span>
-              <h2 className="font-editorial text-2xl text-white mb-3">Pariwisata Alam</h2>
+              <h2 className="font-editorial text-2xl text-white mb-3">{pariwisata?.title || 'Pariwisata Alam'}</h2>
               <div className="text-sm font-semibold text-white flex items-center gap-2">
-                <span className="border-b border-white group-hover:border-transparent transition-colors">Lihat detail</span> <span className="transition-transform group-hover:translate-x-1">&rarr;</span>
+                <span className="border-b border-white group-hover:border-transparent transition-colors">Lihat detail</span> <span className="transition-transform group-hover:translate-x-1"><NavigationChevron direction="next" /></span>
               </div>
             </div>
           </Link>
@@ -85,16 +101,16 @@ export default function PotensiPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <Link href="/potensi/perikanan" className="group bg-paper-50 border border-paper-200 p-8 hover:border-green-300 transition-colors">
             <span className="text-ink-400 text-xs font-bold uppercase tracking-widest mb-3 block">04</span>
-            <h2 className="font-editorial text-2xl text-ink-950 mb-3 group-hover:text-green-800 transition-colors">Perikanan</h2>
-            <p className="text-ink-600 mb-6">Enam mata pencaharian warga tercatat pada profil desa; sektor perikanan bukan di antaranya.</p>
-            <div className="text-sm font-semibold text-green-700 flex items-center gap-1 group-hover:gap-2 transition-all">Jelajahi &rarr;</div>
+            <h2 className="font-editorial text-2xl text-ink-950 mb-3 group-hover:text-green-800 transition-colors">{perikanan?.title || 'Perikanan'}</h2>
+            <p className="text-ink-600 mb-6">{perikanan?.description || 'Enam mata pencaharian warga tercatat pada profil desa; sektor perikanan bukan di antaranya.'}</p>
+            <div className="text-sm font-semibold text-green-700 flex items-center gap-1 group-hover:gap-2 transition-all">Jelajahi <NavigationChevron direction="next" /></div>
           </Link>
           
           <Link href="/potensi/sumber-daya-alam" className="group bg-paper-50 border border-paper-200 p-8 hover:border-green-300 transition-colors">
             <span className="text-ink-400 text-xs font-bold uppercase tracking-widest mb-3 block">05</span>
-            <h2 className="font-editorial text-2xl text-ink-950 mb-3 group-hover:text-green-800 transition-colors">Sumber Daya Alam</h2>
-            <p className="text-ink-600 mb-6">Luas {`7.125,816`} Ha, ketinggian 0–500 mdpl, curah hujan 177,5 mm/tahun, dan suhu 22°C–31°C.</p>
-            <div className="text-sm font-semibold text-green-700 flex items-center gap-1 group-hover:gap-2 transition-all">Jelajahi &rarr;</div>
+            <h2 className="font-editorial text-2xl text-ink-950 mb-3 group-hover:text-green-800 transition-colors">{sumberDayaAlam?.title || 'Sumber Daya Alam'}</h2>
+            <p className="text-ink-600 mb-6">Luas {area} Ha, ketinggian {geography.elevation}, curah hujan {geography.rainfall}, dan suhu {geography.temperature}.</p>
+            <div className="text-sm font-semibold text-green-700 flex items-center gap-1 group-hover:gap-2 transition-all">Jelajahi <NavigationChevron direction="next" /></div>
           </Link>
         </div>
 

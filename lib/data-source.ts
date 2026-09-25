@@ -7,9 +7,12 @@
 export const DATA_SOURCE = {
   news: 'supabase' as const,
   gallery: 'supabase' as const,
-  profile: 'local' as const,
-  demographic: 'local' as const,
-  infrastructure: 'local' as const,
+  profile: 'supabase' as const,
+  demographic: 'supabase' as const,
+  infrastructure: 'supabase' as const,
+  government: 'supabase' as const,
+  potential: 'supabase' as const,
+  website: 'supabase' as const,
 }
 
 export type DataSourceModule = keyof typeof DATA_SOURCE

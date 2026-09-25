@@ -1,11 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import type { GalleryItem } from '@/types/database'
 
+async function getClient() {
+  try {
+    return await createClient()
+  } catch {
+    return null
+  }
+}
+
 /**
  * Get published gallery items for public pages
  */
 export async function getPublishedGallery(): Promise<GalleryItem[]> {
-  const supabase = await createClient()
+  const supabase = await getClient()
+  if (!supabase) return []
+
   const { data, error } = await supabase
     .from('gallery')
     .select('*')
@@ -17,14 +27,16 @@ export async function getPublishedGallery(): Promise<GalleryItem[]> {
     return []
   }
 
-  return data as GalleryItem[]
+  return (data || []) as GalleryItem[]
 }
 
 /**
  * Get all gallery items for admin CMS
  */
 export async function getAllGallery(): Promise<GalleryItem[]> {
-  const supabase = await createClient()
+  const supabase = await getClient()
+  if (!supabase) return []
+
   const { data, error } = await supabase
     .from('gallery')
     .select('*, creator:profiles(full_name)')
@@ -35,14 +47,16 @@ export async function getAllGallery(): Promise<GalleryItem[]> {
     return []
   }
 
-  return data as unknown as GalleryItem[]
+  return (data || []) as unknown as GalleryItem[]
 }
 
 /**
  * Get a single gallery item by ID (admin)
  */
 export async function getGalleryById(id: string): Promise<GalleryItem | null> {
-  const supabase = await createClient()
+  const supabase = await getClient()
+  if (!supabase) return null
+
   const { data, error } = await supabase
     .from('gallery')
     .select('*, creator:profiles(full_name)')
@@ -61,7 +75,9 @@ export async function getGalleryById(id: string): Promise<GalleryItem | null> {
  * Get count of gallery items
  */
 export async function getGalleryCount(): Promise<number> {
-  const supabase = await createClient()
+  const supabase = await getClient()
+  if (!supabase) return 0
+
   const { count, error } = await supabase
     .from('gallery')
     .select('*', { count: 'exact', head: true })

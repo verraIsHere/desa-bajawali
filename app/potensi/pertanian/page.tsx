@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { NavigationChevron } from "@/components/ui/NavigationChevron";
 import { lembagaPerekonomian } from "@/data/dummy";
 
 export const metadata = {
@@ -18,7 +17,7 @@ export default function PotensiPertanianPage() {
             <Link href="/potensi" className="text-xs font-bold uppercase tracking-widest text-ink-400 hover:text-green-700 transition-colors">
               Potensi Desa
             </Link>
-            <span className="text-ink-400 text-xs">&rarr;</span>
+            <span className="text-ink-400 text-xs"><NavigationChevron direction="next" /></span>
             <span className="text-xs font-bold uppercase tracking-widest text-ink-950">
               Pertanian
             </span>
@@ -80,7 +79,11 @@ export default function PotensiPertanianPage() {
 
         <div className="max-w-4xl mx-auto mt-20 pt-8 border-t border-paper-200 flex justify-center">
           <Link href="/potensi" className="group inline-flex items-center justify-center gap-3 bg-green-700 text-white hover:bg-green-800 px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:shadow-[0_8px_30px_rgb(8,118,83,0.3)] hover:-translate-y-1">
-            <ArrowLeft size={20} className="transition-transform duration-300 group-hover:-translate-x-1" />
+            <NavigationChevron
+              direction="previous"
+              size={20}
+              className="shrink-0 transition-transform duration-300 group-hover:-translate-x-1"
+            />
             Kembali ke Daftar Potensi
           </Link>
         </div>

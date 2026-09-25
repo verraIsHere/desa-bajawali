@@ -1,4 +1,5 @@
-import {desaInfo, lembagaPerekonomian, saranaDesa, mataPencaharian} from '@/data/dummy'
+import {lembagaPerekonomian, saranaDesa, mataPencaharian} from '@/data/dummy'
+import { getPublicVillageGeography, getPublicVillageStatistics } from '@/lib/queries/village'
 import Image from 'next/image'
 import {
   KelompokUmurBarChartWrapper,
@@ -13,7 +14,21 @@ export const metadata = {
   title: 'Data Desa & Statistik Bajawali',
 }
 
-export default function DataDesaPage() {
+export default async function DataDesaPage() {
+  const [statistics, geography] = await Promise.all([
+    getPublicVillageStatistics(),
+    getPublicVillageGeography(),
+  ])
+  const population = statistics.population
+  const households = statistics.households
+  const dusun = statistics.dusun
+  const rt = statistics.rt
+  const area = geography.area_ha.toLocaleString('id-ID', {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+  })
+  const dataYear = statistics.data_year
+
   return (
     <div className="py-12 md:py-24">
       <div className="container mx-auto px-5 lg:px-8">
@@ -65,10 +80,10 @@ export default function DataDesaPage() {
               Populasi
             </div>
             <div className="font-editorial text-4xl text-ink-950 mb-2">
-              {desaInfo.penduduk} <span className="text-lg text-ink-400 font-sans">jiwa</span>
+              {population} <span className="text-lg text-ink-400 font-sans">jiwa</span>
             </div>
             <div className="text-xs text-ink-600 bg-paper-100 inline-block px-2 py-1 rounded-sm">
-              Data Desa &bull; 2026
+              Data Desa &bull; {dataYear}
             </div>
           </div>
 
@@ -77,10 +92,10 @@ export default function DataDesaPage() {
               Luas Wilayah
             </div>
             <div className="font-editorial text-4xl text-ink-950 mb-2">
-              {desaInfo.luasWilayah} <span className="text-lg text-ink-400 font-sans">Ha</span>
+              {area} <span className="text-lg text-ink-400 font-sans">Ha</span>
             </div>
             <div className="text-xs text-ink-600 bg-paper-100 inline-block px-2 py-1 rounded-sm">
-              Profil Desa &bull; {desaInfo.tahunData}
+              Profil Desa &bull; {dataYear}
             </div>
           </div>
 
@@ -89,7 +104,7 @@ export default function DataDesaPage() {
               Kepala Keluarga
             </div>
             <div className="font-editorial text-4xl text-ink-950 mb-2">
-              {desaInfo.kk} <span className="text-lg text-ink-400 font-sans">KK</span>
+              {households} <span className="text-lg text-ink-400 font-sans">KK</span>
             </div>
             <div className="text-xs text-ink-600 bg-paper-100 inline-block px-2 py-1 rounded-sm">
               Data Desa
@@ -101,8 +116,8 @@ export default function DataDesaPage() {
               RT / Dusun
             </div>
             <div className="font-editorial text-4xl text-ink-950 mb-2">
-              {desaInfo.rt}{' '}
-              <span className="text-lg text-ink-400 font-sans">/ {desaInfo.dusun}</span>
+              {rt}{' '}
+              <span className="text-lg text-ink-400 font-sans">/ {dusun}</span>
             </div>
             <div className="text-xs text-ink-600 bg-paper-100 inline-block px-2 py-1 rounded-sm">
               Data Desa
@@ -220,7 +235,7 @@ export default function DataDesaPage() {
                 Sarana & Prasarana Desa
               </h3>
               <p className="text-sm text-ink-600">
-                Fasilitas dan sarana desa berdasarkan Profil Desa {desaInfo.tahunData}.
+                Fasilitas dan sarana desa berdasarkan Profil Desa {dataYear}.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

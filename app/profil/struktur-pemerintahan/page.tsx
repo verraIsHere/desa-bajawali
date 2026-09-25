@@ -1,31 +1,7 @@
 import Image from 'next/image'
+import { getPublicVillageStructure } from '@/lib/queries/village'
 
 export const metadata = {title: 'Struktur Pemerintahan Desa Bajawali'}
-
-const perangkatDesa = [
-  {jabatan: 'Sekretaris Desa', nama: 'Kadek Wijaya'},
-  {jabatan: 'Kaur Umum', nama: 'I Gede Andi Suardika'},
-  {jabatan: 'Kaur Keuangan', nama: 'Andreas Stevanus H'},
-  {jabatan: 'Kasi Pemerintahan', nama: 'I Gede Agus Puja S'},
-  {jabatan: 'Kasi Kesejahteraan', nama: 'Meilisa, S.Sos'},
-  {jabatan: 'Staf Desa', nama: 'Ni Komang Ayu Tantri'},
-  {jabatan: 'Staf Desa', nama: 'Pipi Shapira'},
-]
-
-const kepalaDusun = [
-  {dusun: 'Dusun Kerta', nama: 'I Ketut Agus Darmadi'},
-  {dusun: 'Dusun Makmur', nama: 'I Komang Dusasana'},
-  {dusun: 'Dusun Lestari', nama: 'I Wayan Juli Antara'},
-  {dusun: 'Dusun Mandiri', nama: 'Kadek Rikin'},
-]
-
-const bpd = [
-  {jabatan: 'Ketua', nama: 'I Made Mantik, S.Ag.'},
-  {jabatan: 'Wakil Ketua', nama: 'H. Imam Suhadi'},
-  {jabatan: 'Sekretaris', nama: 'Ni Kadek Arnila Wati'},
-  {jabatan: 'Anggota', nama: 'I Gede Sugiarto'},
-  {jabatan: 'Anggota', nama: 'I Kadek Oerdi Arisona'},
-]
 
 const getInitials = (nama: string) =>
   nama
@@ -37,7 +13,27 @@ const getInitials = (nama: string) =>
     .join('')
     .toUpperCase()
 
-export default function StrukturPemerintahanPage() {
+export default async function StrukturPemerintahanPage() {
+  const { officials, bpd } = await getPublicVillageStructure()
+  const kepalaDesa = officials.find((official) => official.position === 'Kepala Desa')
+  const perangkatDesa = officials
+    .filter(
+      (official) =>
+        official.position !== 'Kepala Desa' && official.position !== 'Kepala Dusun',
+    )
+    .map((official) => ({
+      jabatan: official.position,
+      nama: official.name,
+      foto: official.photo_url || undefined,
+    }))
+  const kepalaDusun = officials
+    .filter((official) => official.position === 'Kepala Dusun')
+    .map((official) => ({
+      dusun: official.dusun ? `Kadus ${official.dusun}` : 'Kepala Dusun',
+      nama: official.name,
+      foto: official.photo_url || undefined,
+    }))
+
   return (
     <div className="py-12 md:py-24">
       <div className="container mx-auto px-5 lg:px-8">
@@ -69,8 +65,8 @@ export default function StrukturPemerintahanPage() {
                 {/* Foto */}
                 <div className="relative h-[360px] md:h-[400px] bg-paper-200">
                   <Image
-                    src="/gambar/struktur/kepala-desa-bajawali.webp"
-                    alt="Kepala Desa Bajawali"
+                    src={kepalaDesa?.photo_url || '/gambar/struktur/kepala-desa-bajawali.webp'}
+                    alt={kepalaDesa ? `Kepala Desa ${kepalaDesa.name}` : 'Kepala Desa Bajawali'}
                     fill
                     priority
                     className="object-cover object-top"
@@ -83,12 +79,12 @@ export default function StrukturPemerintahanPage() {
                     Kepala Desa
                   </span>
                   <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl font-semibold text-ink-950 leading-tight mb-5">
-                    Ketut Langga, S.Ag
+                    {kepalaDesa?.name || 'Ketut Langga, S.Ag'}
                   </h2>
                   <div className="w-12 h-px bg-paper-300 mb-5" />
                   <p className="text-ink-600 text-base md:text-lg leading-relaxed max-w-xl">
-                    Memimpin penyelenggaraan pemerintahan desa, pelaksanaan pembangunan desa,
-                    pembinaan kemasyarakatan desa, dan pemberdayaan masyarakat desa.
+                    {kepalaDesa?.welcome_text ||
+                      'Memimpin penyelenggaraan pemerintahan desa, pelaksanaan pembangunan desa, pembinaan kemasyarakatan desa, dan pemberdayaan masyarakat desa.'}
                   </p>
                 </div>
               </div>
@@ -115,10 +111,20 @@ export default function StrukturPemerintahanPage() {
                   key={`${perangkat.jabatan}-${perangkat.nama}`}
                   className="bg-paper-50 border border-paper-200 rounded-md p-5 md:p-6 text-center"
                 >
-                  <div className="w-24 h-24 md:w-28 md:h-28 mx-auto mb-5 rounded-full border-4 border-white shadow-sm bg-paper-200 flex items-center justify-center">
-                    <span className="font-editorial text-2xl md:text-3xl text-ink-500">
-                      {getInitials(perangkat.nama)}
-                    </span>
+                  <div className="relative w-24 h-24 md:w-28 md:h-28 mx-auto mb-5 overflow-hidden rounded-full border-4 border-white shadow-sm bg-paper-200 flex items-center justify-center">
+                    {perangkat.foto ? (
+                      <Image
+                        src={perangkat.foto}
+                        alt={`Foto ${perangkat.nama}`}
+                        fill
+                        sizes="(max-width: 640px) 96px, 112px"
+                        className="object-cover object-top"
+                      />
+                    ) : (
+                      <span className="font-editorial text-2xl md:text-3xl text-ink-500">
+                        {getInitials(perangkat.nama)}
+                      </span>
+                    )}
                   </div>
                   <div className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.14em] text-green-700 mb-2">
                     {perangkat.jabatan}
@@ -150,6 +156,21 @@ export default function StrukturPemerintahanPage() {
                   key={dusun.dusun}
                   className="bg-paper-50 border border-paper-200 rounded-md p-5 md:p-6 text-center"
                 >
+                  <div className="relative w-20 h-20 mx-auto mb-4 overflow-hidden rounded-full border-4 border-white shadow-sm bg-paper-200 flex items-center justify-center">
+                    {dusun.foto ? (
+                      <Image
+                        src={dusun.foto}
+                        alt={`Foto ${dusun.nama}`}
+                        fill
+                        sizes="80px"
+                        className="object-cover object-top"
+                      />
+                    ) : (
+                      <span className="font-editorial text-xl text-ink-500">
+                        {getInitials(dusun.nama)}
+                      </span>
+                    )}
+                  </div>
                   <div className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.14em] text-green-700 mb-2">
                     {dusun.dusun}
                   </div>
@@ -177,14 +198,14 @@ export default function StrukturPemerintahanPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
               {bpd.map((anggota) => (
                 <div
-                  key={`${anggota.jabatan}-${anggota.nama}`}
+                  key={`${anggota.position}-${anggota.name}`}
                   className="bg-paper-50 border border-paper-200 rounded-md p-5 md:p-6 text-center"
                 >
                   <div className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.14em] text-green-700 mb-2">
-                    {anggota.jabatan}
+                    {anggota.position}
                   </div>
                   <h4 className="font-editorial text-xl md:text-2xl font-semibold text-ink-950">
-                    {anggota.nama}
+                    {anggota.name}
                   </h4>
                 </div>
               ))}

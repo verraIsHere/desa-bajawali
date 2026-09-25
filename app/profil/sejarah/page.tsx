@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { NavigationChevron } from "@/components/ui/NavigationChevron";
 
 export const metadata = {
   title: "Sejarah Desa Bajawali",
@@ -65,8 +66,8 @@ export default function SejarahPage() {
           
           <div className="mt-16 pt-8 border-t border-paper-200 flex justify-between items-center">
             <div className="text-sm text-ink-600">Terakhir diperbarui: 2026</div>
-            <a href="/profil/struktur-pemerintahan" className="text-sm font-semibold text-green-700 hover:text-green-800 transition-colors">
-              Lihat Struktur Pemerintahan &rarr;
+            <a href="/profil/struktur-pemerintahan" className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-700 hover:text-green-800 transition-colors">
+              Lihat Struktur Pemerintahan <NavigationChevron direction="next" />
             </a>
           </div>
         </div>

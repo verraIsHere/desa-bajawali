@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Plus, Pencil, Trash2, ExternalLink } from 'lucide-react'
+import { Plus, Pencil, ExternalLink } from 'lucide-react'
 import { getAllNews } from '@/lib/queries/news'
 import StatusBadge from '@/components/admin/StatusBadge'
 import DeleteNewsButton from './DeleteNewsButton'

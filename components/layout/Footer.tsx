@@ -141,6 +141,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { NavigationChevron } from '@/components/ui/NavigationChevron'
 
 export default function Footer() {
   return (
@@ -163,6 +164,24 @@ export default function Footer() {
                 </span>
                 <span className="text-xs font-semibold uppercase tracking-widest text-ink-400">
                   Lariang, Pasangkayu
+                </span>
+              </span>
+            </Link>
+            <Link href="/" className="flex items-center gap-3 mb-4">
+              <Image
+                src="/gambar/logo_unimaju.webp"
+                alt="Lambang Universitas Muhammadiyah Mamuju"
+                width={728}
+                height={800}
+                sizes="48px"
+                className="h-12 w-auto shrink-0"
+              />
+              <span className="flex flex-col">
+                <span className="font-editorial text-xl font-semibold tracking-tight text-ink-950">
+                  Posko Bajawali
+                </span>
+                <span className="text-xs font-semibold uppercase tracking-widest text-ink-400">
+                  Universitas Muhammadiyah Mamuju
                 </span>
               </span>
             </Link>
@@ -271,9 +290,9 @@ export default function Footer() {
               <li className="mt-2">
                 <Link
                   href="/kontak"
-                  className="text-green-700 hover:text-green-800 font-medium transition-colors"
+                  className="inline-flex items-center gap-1.5 text-green-700 hover:text-green-800 font-medium transition-colors"
                 >
-                  Hubungi Kami &rarr;
+                  Hubungi Kami <NavigationChevron direction="next" />
                 </Link>
               </li>
             </ul>

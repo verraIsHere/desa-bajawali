@@ -25,6 +25,10 @@ export default async function GaleriPage() {
     galleryList = galeriDummy
   }
 
+  if (galleryList.length === 0) {
+    galleryList = galeriDummy
+  }
+
   return (
     <div className="py-12 md:py-24">
       <div className="container mx-auto px-5 lg:px-8">

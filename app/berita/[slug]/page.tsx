@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getNewsBySlug, getPublishedNews } from "@/lib/queries/news";
 import { isSupabaseSource } from "@/lib/data-source";
 import type { Metadata } from 'next'
+import { NavigationChevron } from '@/components/ui/NavigationChevron'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -18,6 +19,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     if (news) {
       title = news.title
       excerpt = news.excerpt
+    } else {
+      const fallbackNews = beritaDummy.find((item) => item.slug === slug)
+      if (fallbackNews) {
+        title = fallbackNews.title
+        excerpt = fallbackNews.excerpt
+      }
     }
   } else {
     const news = beritaDummy.find((n) => n.slug === slug);
@@ -42,37 +49,69 @@ export default async function BeritaDetailPage({ params }: { params: Promise<{ s
 
   if (isSupabase) {
     const news = await getNewsBySlug(slug)
-    if (!news) notFound()
-      
-    newsData = {
-      id: news.id,
-      title: news.title,
-      category: news.category,
-      date: new Date(news.published_at || news.created_at).toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      }),
-      excerpt: news.excerpt,
-      contentHTML: news.content, // HTML from TipTap
-      image: news.image_url || '/gambar/galeri/galeri_1.webp',
-      author: news.author?.full_name || 'Admin Desa'
+    if (news) {
+      newsData = {
+        id: news.id,
+        title: news.title,
+        category: news.category,
+        date: new Date(news.published_at || news.created_at).toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        }),
+        excerpt: news.excerpt,
+        contentHTML: news.content, // HTML from TipTap
+        image: news.image_url || '/gambar/galeri/galeri_1.webp',
+        author: news.author?.full_name || 'Admin Desa'
+      }
+
+      const allNews = await getPublishedNews()
+      if (allNews.length > 0) {
+        relatedNewsList = allNews.filter((item) => item.id !== news.id).slice(0, 2).map((item) => ({
+          id: item.id,
+          slug: item.slug,
+          title: item.title,
+          category: item.category,
+          date: new Date(item.published_at || item.created_at).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+          }),
+          image: item.image_url || '/gambar/galeri/galeri_1.webp'
+        }))
+      } else {
+        relatedNewsList = beritaDummy.filter((item) => item.id !== news.id).slice(0, 2).map((item) => ({
+          id: item.id,
+          slug: item.slug,
+          title: item.title,
+          category: item.category,
+          date: item.date,
+          image: item.image
+        }))
+      }
+    } else {
+      const fallbackNews = beritaDummy.find((item) => item.slug === slug)
+      if (!fallbackNews) notFound()
+
+      newsData = {
+        id: fallbackNews.id,
+        title: fallbackNews.title,
+        category: fallbackNews.category,
+        date: fallbackNews.date,
+        excerpt: fallbackNews.excerpt,
+        content: fallbackNews.content,
+        image: fallbackNews.image,
+        author: 'Admin Desa'
+      }
+      relatedNewsList = beritaDummy.filter((item) => item.id !== fallbackNews.id).slice(0, 2).map((item) => ({
+        id: item.id,
+        slug: item.slug,
+        title: item.title,
+        category: item.category,
+        date: item.date,
+        image: item.image
+      }))
     }
-
-    const allNews = await getPublishedNews()
-    relatedNewsList = allNews.filter(n => n.id !== news.id).slice(0, 2).map(n => ({
-      id: n.id,
-      slug: n.slug,
-      title: n.title,
-      category: n.category,
-      date: new Date(n.published_at || n.created_at).toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      }),
-      image: n.image_url || '/gambar/galeri/galeri_1.webp'
-    }))
-
   } else {
     const news = beritaDummy.find((n) => n.slug === slug);
     if (!news) notFound()
@@ -108,7 +147,7 @@ export default async function BeritaDetailPage({ params }: { params: Promise<{ s
             <Link href="/berita" className="text-xs font-bold uppercase tracking-widest text-ink-400 hover:text-green-700 transition-colors">
               Berita
             </Link>
-            <span className="text-ink-400 text-xs">&rarr;</span>
+            <span className="text-ink-400 text-xs"><NavigationChevron direction="next" /></span>
             <span className="text-xs font-bold uppercase tracking-widest text-green-700">
               {newsData.category}
             </span>
