@@ -181,6 +181,24 @@ export async function getVillageDataOverview() {
   }
 }
 
+/**
+ * Untuk halaman CMS: mengambil seluruh baris (aktif maupun non-aktif) agar
+ * admin bisa mengelola status aktif. Membutuhkan policy RLS
+ * "Authenticated can read all ..." di supabase-migration.sql.
+ */
+export async function getAdminStructure() {
+  const supabase = await createClient()
+  const [officialsResult, bpdResult] = await Promise.all([
+    supabase.from('village_officials').select('*').order('sort_order', { ascending: true }),
+    supabase.from('village_bpd').select('*').order('sort_order', { ascending: true }),
+  ])
+
+  return {
+    officials: (officialsResult.data as unknown as VillageOfficial[] | null) ?? [],
+    bpd: (bpdResult.data as unknown as VillageBpdMember[] | null) ?? [],
+  }
+}
+
 export async function getContentOverview() {
   const supabase = await createClient()
   const [profileResult, officialsResult, bpdResult, potentialsResult, contactResult, heroResult] =

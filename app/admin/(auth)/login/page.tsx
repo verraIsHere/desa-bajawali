@@ -45,12 +45,8 @@ export default function AdminLoginPage() {
       <div className="relative z-10 w-full max-w-md px-6">
         {/* Logo & Branding */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-600 rounded-lg mb-4 shadow-lg">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight" style={{ fontFamily: 'var(--font-editorial), serif' }}>
+         
+          <h1 className="text-2xl font-bold !text-white tracking-tight" style={{ fontFamily: 'var(--font-editorial), serif' }}>
             DESA BAJAWALI
           </h1>
           <p className="text-green-300/70 text-sm mt-1">
@@ -125,7 +121,7 @@ export default function AdminLoginPage() {
 
         {/* Footer */}
         <p className="text-center text-green-300/40 text-xs mt-6">
-          &copy; {new Date().getFullYear()} Desa Bajawali &middot; Kec. Lariang, Kab. Pasangkayu
+          &copy; {new Date().getFullYear()} Desa Bajawali &middot; Universitas Muhammadiyah Mamuju
         </p>
       </div>
     </div>

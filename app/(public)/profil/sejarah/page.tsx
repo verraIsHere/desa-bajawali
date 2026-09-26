@@ -1,11 +1,14 @@
 import Image from "next/image";
 import { NavigationChevron } from "@/components/ui/NavigationChevron";
+import { getPublicVillageProfile } from "@/lib/queries/village";
 
 export const metadata = {
   title: "Sejarah Desa Bajawali",
 };
 
-export default function SejarahPage() {
+export default async function SejarahPage() {
+  const profile = await getPublicVillageProfile();
+
   return (
     <div className="py-12 md:py-24">
       <div className="container mx-auto px-5 lg:px-8">
@@ -23,13 +26,15 @@ export default function SejarahPage() {
               src="/gambar/background/background_1.webp" 
               alt="Sejarah Desa Bajawali" 
               fill
+              sizes="100vw"
               className="object-cover"
             />
           </div>
 
           <div className="prose prose-xl prose-p:text-ink-800 prose-headings:font-editorial prose-headings:text-ink-950 max-w-none">
+            {/* Paragraf pembuka diambil dari field "Sejarah" pada CMS. */}
             <p className="text-xl font-medium text-ink-950 leading-relaxed mb-8">
-              Desa Bajawali terletak di Kecamatan Lariang, Kabupaten Pasangkayu, Provinsi Sulawesi Barat. Pada awalnya wilayah ini merupakan hutan belantara yang kemudian dibuka oleh pemerintah untuk menjadi pemukiman melalui program transmigrasi PIR.
+              {profile.history}
             </p>
             
             <h2>Tujuan Program Transmigrasi</h2>
@@ -60,12 +65,13 @@ export default function SejarahPage() {
 
             <h2>Kondisi Saat Ini</h2>
             <p>
-              Kini, Desa Bajawali terus berbenah menuju desa yang mandiri dan berdaya saing dengan moto <strong>BAJAWALIKU JAYA</strong>. Melalui kolaborasi antara pemerintah desa dan warga, berbagai potensi lokal terus digali, baik dari sektor pertanian maupun pemberdayaan UMKM.
+              Kini, Desa Bajawali terus berbenah menuju desa yang mandiri dan berdaya saing dengan moto{' '}
+              <strong>{profile.motto}</strong>. Melalui kolaborasi antara pemerintah desa dan warga, berbagai potensi lokal terus digali, baik dari sektor pertanian maupun pemberdayaan UMKM.
             </p>
           </div>
           
           <div className="mt-16 pt-8 border-t border-paper-200 flex justify-between items-center">
-            <div className="text-sm text-ink-600">Terakhir diperbarui: 2026</div>
+            <div className="text-sm text-ink-600">Profil Desa {profile.data_year}</div>
             <a href="/profil/struktur-pemerintahan" className="inline-flex items-center gap-1.5 text-sm font-semibold text-green-700 hover:text-green-800 transition-colors">
               Lihat Struktur Pemerintahan <NavigationChevron direction="next" />
             </a>

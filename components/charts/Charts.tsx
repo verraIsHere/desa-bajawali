@@ -41,6 +41,11 @@ const colors = {
   ink400: '#8A938D'
 };
 
+export interface ChartRow {
+  label: string;
+  value: number | null;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const commonOptions: ChartOptions<any> = {
   responsive: true,
@@ -94,7 +99,7 @@ const gridOptions = {
     },
     y: {
       grid: {
-        color: colors.paper200,
+        color: colors.paper200
       },
       border: {
         display: false
@@ -109,143 +114,205 @@ const gridOptions = {
   }
 };
 
-export function KelompokUmurBarChart() {
+const barOptions = {
+  ...commonOptions,
+  ...gridOptions,
+  plugins: {
+    ...commonOptions.plugins,
+    legend: {
+      display: false
+    }
+  }
+};
+
+function emptyState(message: string) {
+  return (
+    <div className="flex h-full w-full items-center justify-center text-sm text-ink-400">
+      {message}
+    </div>
+  );
+}
+
+export function KelompokUmurBarChart({
+  rows = [
+    { label: '0-14', value: 119 },
+    { label: '15-24', value: 143 },
+    { label: '25-54', value: 346 },
+    { label: '55-64', value: 102 },
+    { label: '65+', value: 52 }
+  ]
+}: {
+  rows?: ChartRow[];
+}) {
+  if (rows.length === 0) return emptyState('Data kelompok umur belum diisi.');
+
   const data = {
-    labels: ['0-14', '15-24', '25-54', '55-64', '65+'],
+    labels: rows.map((row) => row.label),
     datasets: [
       {
         label: 'Jumlah Jiwa',
-        data: [119, 143, 346, 102, 52],
+        data: rows.map((row) => row.value),
         backgroundColor: colors.green300,
         hoverBackgroundColor: colors.green700,
-        borderRadius: 4,
-      },
-    ],
-  };
-
-  const options = {
-    ...commonOptions,
-    ...gridOptions,
-    plugins: {
-      ...commonOptions.plugins,
-      legend: {
-        display: false
+        borderRadius: 4
       }
-    },
-    indexAxis: 'y' as const, // Horizontal bar
+    ]
   };
 
-  return <div className="w-full h-full"><Bar options={options} data={data} /></div>;
+  return (
+    <div className="w-full h-full">
+      <Bar options={{ ...barOptions, indexAxis: 'y' as const }} data={data} />
+    </div>
+  );
 }
 
-export function AgamaDoughnutChart() {
+export function AgamaDoughnutChart({
+  rows = [
+    { label: 'Islam', value: 146 },
+    { label: 'Hindu', value: 586 },
+    { label: 'Kristen', value: 7 },
+    { label: 'Katholik', value: 24 }
+  ]
+}: {
+  rows?: ChartRow[];
+}) {
+  if (rows.length === 0) return emptyState('Data agama belum diisi.');
+
   const data = {
-    labels: ['Islam', 'Hindu', 'Kristen', 'Katholik'],
+    labels: rows.map((row) => row.label),
     datasets: [
       {
-        data: [146, 586, 7, 24],
+        data: rows.map((row) => row.value),
         backgroundColor: [
           colors.green700,
           colors.sun,
           colors.clay,
-          colors.blueMap,
+          colors.blueMap
         ],
         borderWidth: 0,
         hoverOffset: 4
-      },
-    ],
+      }
+    ]
   };
 
   return <div className="w-full h-full"><Doughnut options={commonOptions} data={data} /></div>;
 }
 
-export function SukuDoughnutChart() {
+export function SukuDoughnutChart({
+  rows = [
+    { label: 'Bali', value: 585 },
+    { label: 'Bugis', value: 59 },
+    { label: 'Jawa', value: 75 },
+    { label: 'Tator', value: 34 },
+    { label: 'Mandar', value: 3 }
+  ]
+}: {
+  rows?: ChartRow[];
+}) {
+  if (rows.length === 0) return emptyState('Data suku belum diisi.');
+
   const data = {
-    labels: ['Bali', 'Bugis', 'Jawa', 'Tator', 'Mandar'],
+    labels: rows.map((row) => row.label),
     datasets: [
       {
-        data: [585, 59, 75, 34, 3],
+        data: rows.map((row) => row.value),
         backgroundColor: [
           colors.green300,
           colors.green700,
           colors.blueMap,
           colors.clay,
-          colors.sun,
+          colors.sun
         ],
         borderWidth: 0,
         hoverOffset: 4
-      },
-    ],
+      }
+    ]
   };
 
   return <div className="w-full h-full"><Doughnut options={commonOptions} data={data} /></div>;
 }
 
-export function StatusPernikahanPieChart() {
+export function StatusPernikahanPieChart({
+  rows = [
+    { label: 'Kawin', value: 419 },
+    { label: 'Belum Kawin', value: 319 }
+  ]
+}: {
+  rows?: ChartRow[];
+}) {
+  if (rows.length === 0) return emptyState('Data status pernikahan belum diisi.');
+
   const data = {
-    labels: ['Kawin', 'Belum Kawin'],
+    labels: rows.map((row) => row.label),
     datasets: [
       {
-        data: [419, 319],
-        backgroundColor: [
-          colors.green700,
-          colors.green100,
-        ],
+        data: rows.map((row) => row.value),
+        backgroundColor: [colors.green700, colors.green100],
         borderWidth: 0,
         hoverOffset: 4
-      },
-    ],
+      }
+    ]
   };
 
   return <div className="w-full h-full"><Doughnut options={commonOptions} data={data} /></div>;
 }
 
-export function DistribusiWilayahBarChart() {
+export function DistribusiWilayahBarChart({
+  rows = [
+    { label: 'Dusun Kerta', value: 164 },
+    { label: 'Dusun Makmur', value: 350 },
+    { label: 'Dusun Lestari', value: 174 },
+    { label: 'Dusun Mandiri', value: 77 }
+  ]
+}: {
+  rows?: ChartRow[];
+}) {
+  if (rows.length === 0) return emptyState('Data distribusi dusun belum diisi.');
+
   const data = {
-    labels: ['Dusun Kerta', 'Dusun Makmur', 'Dusun Lestari', 'Dusun Mandiri'],
+    labels: rows.map((row) => row.label),
     datasets: [
       {
         label: 'Populasi',
-        data: [164, 350, 174, 77],
+        data: rows.map((row) => row.value),
         backgroundColor: colors.blueMap,
         hoverBackgroundColor: colors.green700,
-        borderRadius: 4,
-      },
-    ],
-  };
-
-  const options = {
-    ...commonOptions,
-    ...gridOptions,
-    plugins: {
-      ...commonOptions.plugins,
-      legend: {
-        display: false
+        borderRadius: 4
       }
-    },
+    ]
   };
 
-  return <div className="w-full h-full"><Bar options={options} data={data} /></div>;
+  return <div className="w-full h-full"><Bar options={barOptions} data={data} /></div>;
 }
 
-export function LembagaEkonomiDoughnutChart() {
+export function LembagaEkonomiDoughnutChart({
+  rows = [
+    { label: 'Gapoktan', value: 1 },
+    { label: 'BUMDesa', value: 1 },
+    { label: 'Kelompok Tani', value: 10 },
+    { label: 'Kelompok Ternak', value: 1 }
+  ]
+}: {
+  rows?: ChartRow[];
+}) {
+  if (rows.length === 0) return emptyState('Data lembaga ekonomi belum diisi.');
+
   const data = {
-    labels: ['Gapoktan', 'BUMDesa', 'Kelompok Tani', 'Kelompok Ternak'],
+    labels: rows.map((row) => row.label),
     datasets: [
       {
-        data: [1, 1, 10, 1],
+        data: rows.map((row) => row.value),
         backgroundColor: [
           colors.green700,
           colors.clay,
           colors.sun,
-          colors.blueMap,
+          colors.blueMap
         ],
         borderWidth: 0,
         hoverOffset: 4
-      },
-    ],
+      }
+    ]
   };
 
   return <div className="w-full h-full"><Doughnut options={commonOptions} data={data} /></div>;
 }
-

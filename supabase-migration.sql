@@ -438,6 +438,23 @@ CREATE POLICY "Public can read contact information" ON public.contact_informatio
 DROP POLICY IF EXISTS "Public can read active hero slides" ON public.hero_slides;
 CREATE POLICY "Public can read active hero slides" ON public.hero_slides FOR SELECT TO anon, authenticated USING (is_active = true);
 
+-- CATATAN: policy "Authenticated can read all ..." di bawah juga tersedia
+-- terpisah di supabase-cms-policies.sql. Jalankan file terpisah itu, bukan
+-- seluruh file ini, bila database sudah berisi data hasil editan CMS.
+
+-- CMS admin perlu melihat seluruh baris, termasuk yang disembunyikan, supaya
+-- data non-aktif bisa diedit atau ditampilkan lagi. Policy permissive di
+-- Postgres bersifat OR, sehingga policy ini tidak relaxing hak akses anon:
+-- anon tetap hanya bisa membaca baris yang aktif.
+DROP POLICY IF EXISTS "Authenticated can read all village officials" ON public.village_officials;
+CREATE POLICY "Authenticated can read all village officials" ON public.village_officials FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Authenticated can read all village bpd" ON public.village_bpd;
+CREATE POLICY "Authenticated can read all village bpd" ON public.village_bpd FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Authenticated can read all hero slides" ON public.hero_slides;
+CREATE POLICY "Authenticated can read all hero slides" ON public.hero_slides FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Authenticated can read all village potentials" ON public.village_potentials;
+CREATE POLICY "Authenticated can read all village potentials" ON public.village_potentials FOR SELECT TO authenticated USING (true);
+
 -- Authenticated users dapat mengelola seluruh data CMS utama.
 DROP POLICY IF EXISTS "Authenticated can manage desa profile" ON public.desa_profile;
 CREATE POLICY "Authenticated can manage desa profile" ON public.desa_profile FOR ALL TO authenticated USING (true) WITH CHECK (true);
@@ -550,17 +567,17 @@ INSERT INTO public.village_officials
   (name, position, photo_url, photo_path, period, welcome_text, dusun, sort_order, is_active)
 VALUES
   ('Ketut Langga, S.Ag', 'Kepala Desa', '/gambar/struktur/kepala-desa-bajawali.webp', '/gambar/struktur/kepala-desa-bajawali.webp', '2025', 'Memimpin penyelenggaraan pemerintahan, pembangunan, pembinaan kemasyarakatan, dan pemberdayaan masyarakat desa.', NULL, 1, true),
-  ('Kadek Wijaya', 'Sekretaris Desa', NULL, NULL, NULL, NULL, NULL, 2, true),
+  ('Kadek Wijaya', 'Sekretaris Desa', '/gambar/struktur/Kadek Wijaya.webp', '/gambar/struktur/Kadek Wijaya.webp', NULL, NULL, NULL, 2, true),
   ('I Gede Andi Suardika', 'Kaur Umum dan Perencanaan', '/gambar/struktur/I GEDE ANDI SUARDIKA.webp', '/gambar/struktur/I GEDE ANDI SUARDIKA.webp', NULL, NULL, NULL, 3, true),
-  ('Andreas Stevanus H', 'Kaur Keuangan', NULL, NULL, NULL, NULL, NULL, 4, true),
+  ('Andreas Stevanus H', 'Kaur Keuangan', '/gambar/struktur/Andreas Stevanus H.webp', '/gambar/struktur/Andreas Stevanus H.webp', NULL, NULL, NULL, 4, true),
   ('I Gede Agus Puja', 'Kasi Pemerintah', '/gambar/struktur/igede Agus puja.webp', '/gambar/struktur/igede Agus puja.webp', NULL, NULL, NULL, 5, true),
   ('Meilisa', 'Kasi Kesra & Pelayanan', '/gambar/struktur/Meilisa.webp', '/gambar/struktur/Meilisa.webp', NULL, NULL, NULL, 6, true),
   ('Ni Komang Ayu Tantri', 'Staf Kaur Keuangan', '/gambar/struktur/Ni km ayu Tantri.webp', '/gambar/struktur/Ni km ayu Tantri.webp', NULL, NULL, NULL, 7, true),
   ('Ni Made Pipi Saphira', 'Staf Kasi Kesra', '/gambar/struktur/NI MADE PIPI SAPHIRA.webp', '/gambar/struktur/NI MADE PIPI SAPHIRA.webp', NULL, NULL, NULL, 8, true),
   ('I Ketut Agus Darmadi', 'Kepala Dusun', '/gambar/struktur/I ketut agus darmadi.webp', '/gambar/struktur/I ketut agus darmadi.webp', NULL, NULL, 'Kerta', 9, true),
   ('Ni Komang Suartini', 'Kepala Dusun', '/gambar/struktur/Ni Komang Suartini.webp', '/gambar/struktur/Ni Komang Suartini.webp', NULL, NULL, 'Makmur', 10, true),
-  ('I Wayan Juli Antara', 'Kepala Dusun', NULL, NULL, NULL, NULL, 'Lestari', 11, true),
-  ('Kadek Rikin', 'Kepala Dusun', NULL, NULL, NULL, NULL, 'Mandiri', 12, true)
+  ('I Wayan Juli Antara', 'Kepala Dusun', '/gambar/struktur/I Wayan Juli Antara.webp', '/gambar/struktur/I Wayan Juli Antara.webp', NULL, NULL, 'Lestari', 11, true),
+  ('Kadek Rikin', 'Kepala Dusun', '/gambar/struktur/Kadek Rikin.webp', '/gambar/struktur/Kadek Rikin.webp', NULL, NULL, 'Mandiri', 12, true)
 ON CONFLICT (position, name) DO UPDATE SET
   photo_url = EXCLUDED.photo_url,
   photo_path = EXCLUDED.photo_path,
@@ -570,6 +587,13 @@ ON CONFLICT (position, name) DO UPDATE SET
   sort_order = EXCLUDED.sort_order,
   is_active = EXCLUDED.is_active;
 
+-- Koreksi nama anggota BPD. Dilakukan sebelum seed karena UNIQUE (position, name):
+-- bila hanya mengganti nilai di seed, baris lama tidak akan kena ON CONFLICT
+-- sehingga muncul dua anggota dengan nama yang sama.
+UPDATE public.village_bpd
+SET name = 'I Kadek Perdi Arisona'
+WHERE name = 'I Kadek Oerdi Arisona';
+
 INSERT INTO public.village_bpd
   (name, position, photo_url, photo_path, sort_order, is_active)
 VALUES
@@ -577,7 +601,7 @@ VALUES
   ('H. Imam Suhadi', 'Wakil Ketua', NULL, NULL, 2, true),
   ('Ni Kadek Arnila Wati', 'Sekretaris', NULL, NULL, 3, true),
   ('I Gede Sugiarto', 'Anggota', NULL, NULL, 4, true),
-  ('I Kadek Oerdi Arisona', 'Anggota', NULL, NULL, 5, true)
+  ('I Kadek Perdi Arisona', 'Anggota', NULL, NULL, 5, true)
 ON CONFLICT (position, name) DO UPDATE SET
   photo_url = EXCLUDED.photo_url,
   photo_path = EXCLUDED.photo_path,

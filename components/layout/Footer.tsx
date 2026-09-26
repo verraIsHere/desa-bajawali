@@ -142,8 +142,17 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { NavigationChevron } from '@/components/ui/NavigationChevron'
+import {
+  getPublicContactInformation,
+  getPublicVillageProfile,
+} from '@/lib/queries/village'
 
-export default function Footer() {
+export default async function Footer() {
+  const [contact, profile] = await Promise.all([
+    getPublicContactInformation(),
+    getPublicVillageProfile(),
+  ])
+
   return (
     <footer className="border-t border-paper-200 bg-paper-100 mt-24">
       <div className="container mx-auto px-5 lg:px-8 py-16">
@@ -160,10 +169,10 @@ export default function Footer() {
               />
               <span className="flex flex-col">
                 <span className="font-editorial text-xl font-semibold tracking-tight text-ink-950">
-                  Desa Bajawali
+                  {profile.name}
                 </span>
                 <span className="text-xs font-semibold uppercase tracking-widest text-ink-400">
-                  Lariang, Pasangkayu
+                  {profile.district}, {profile.regency}
                 </span>
               </span>
             </Link>
@@ -284,9 +293,10 @@ export default function Footer() {
               Kontak
             </h3>
             <ul className="flex flex-col gap-3 text-sm text-ink-600">
-              <li>Kantor Desa Bajawali</li>
-              <li>Kec. Lariang, Kab. Pasangkayu</li>
-              <li>Sulawesi Barat</li>
+              <li>{contact.address}</li>
+              {contact.email ? <li>{contact.email}</li> : null}
+              {contact.whatsapp ? <li>{contact.whatsapp}</li> : null}
+              {contact.service_hours ? <li>{contact.service_hours}</li> : null}
               <li className="mt-2">
                 <Link
                   href="/kontak"

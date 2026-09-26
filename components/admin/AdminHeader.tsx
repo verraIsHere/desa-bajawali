@@ -29,7 +29,7 @@ export default function AdminHeader() {
   const parentTitle = breadcrumbMap[parentPath]
 
   return (
-    <header className="bg-white border-b border-paper-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+    <header className="md:mt-8 bg-white border-b border-paper-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
       <div className="flex items-center gap-2 ml-10 md:ml-0">
         {parentTitle && (
           <>

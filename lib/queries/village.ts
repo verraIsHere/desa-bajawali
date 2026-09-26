@@ -15,6 +15,41 @@ import type {
 
 const fallbackTimestamp = '2026-01-01T00:00:00+08:00'
 
+const strukturPhotoDir = '/gambar/struktur'
+
+// Foto perangkat desa disimpan di public/gambar/struktur dengan nama file
+// mengikuti nama pejabat. Dipakai sebagai fallback ketika photo_url kosong.
+const localOfficialPhotos: Record<string, string> = {
+  'ketut langga': `${strukturPhotoDir}/kepala-desa-bajawali.webp`,
+  'kadek wijaya': `${strukturPhotoDir}/Kadek Wijaya.webp`,
+  'i gede andi suardika': `${strukturPhotoDir}/I GEDE ANDI SUARDIKA.webp`,
+  'andreas stevanus h': `${strukturPhotoDir}/Andreas Stevanus H.webp`,
+  'i gede agus puja': `${strukturPhotoDir}/igede Agus puja.webp`,
+  meilisa: `${strukturPhotoDir}/Meilisa.webp`,
+  'ni komang ayu tantri': `${strukturPhotoDir}/Ni km ayu Tantri.webp`,
+  'ni made pipi saphira': `${strukturPhotoDir}/NI MADE PIPI SAPHIRA.webp`,
+  'i ketut agus darmadi': `${strukturPhotoDir}/I ketut agus darmadi.webp`,
+  'ni komang suartini': `${strukturPhotoDir}/Ni Komang Suartini.webp`,
+  'i wayan juli antara': `${strukturPhotoDir}/I Wayan Juli Antara.webp`,
+  'kadek rikin': `${strukturPhotoDir}/Kadek Rikin.webp`,
+}
+
+const normalizeName = (name: string) =>
+  name
+    .replace(/,.*$/, '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+
+function withLocalPhoto<T extends { name: string; photo_url: string | null; photo_path: string | null }>(
+  official: T,
+): T {
+  if (official.photo_url || official.photo_path) return official
+  const localPhoto = localOfficialPhotos[normalizeName(official.name)]
+  if (!localPhoto) return official
+  return { ...official, photo_url: localPhoto, photo_path: localPhoto }
+}
+
 const fallbackProfile: DesaProfile = {
   id: 1,
   name: desaInfo.name,
@@ -392,7 +427,7 @@ const fallbackBpd: VillageBpdMember[] = [
   ['H. Imam Suhadi', 'Wakil Ketua'],
   ['Ni Kadek Arnila Wati', 'Sekretaris'],
   ['I Gede Sugiarto', 'Anggota'],
-  ['I Kadek Oerdi Arisona', 'Anggota'],
+  ['I Kadek Perdi Arisona', 'Anggota'],
 ].map(([name, position], index) => ({
   id: `fallback-bpd-${index + 1}`,
   name,
@@ -475,7 +510,10 @@ export async function getPublishedPotentials(): Promise<VillagePotential[]> {
 
 export async function getPublicVillageStructure() {
   if (!isSupabaseSource('government')) {
-    return { officials: fallbackOfficials, bpd: fallbackBpd }
+    return {
+      officials: fallbackOfficials.map(withLocalPhoto),
+      bpd: fallbackBpd,
+    }
   }
 
   const [officials, bpd] = await Promise.all([
@@ -486,7 +524,8 @@ export async function getPublicVillageStructure() {
   const activeBpd = bpd.filter((member) => member.is_active)
 
   return {
-    officials: activeOfficials.length > 0 ? activeOfficials : fallbackOfficials,
+    officials:
+      activeOfficials.length > 0 ? activeOfficials.map(withLocalPhoto) : fallbackOfficials.map(withLocalPhoto),
     bpd: activeBpd.length > 0 ? activeBpd : fallbackBpd,
   }
 }

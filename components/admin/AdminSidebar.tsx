@@ -106,7 +106,7 @@ export default function AdminSidebar({ profile }: SidebarProps) {
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-green-800/30">
+      <div className="px-5 py-8 border-b border-green-800/30">
         <Link href="/admin" className="flex items-center gap-3">
           <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center flex-shrink-0">
             <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -240,7 +240,7 @@ export default function AdminSidebar({ profile }: SidebarProps) {
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-64 md:flex-shrink-0 bg-green-950 min-h-screen sticky top-0">
+      <aside className="h-[100vh]  hidden md:flex md:flex-col md:w-64 md:flex-shrink-0 bg-green-950 min-h-screen sticky top-0">
         {sidebarContent}
       </aside>
     </>

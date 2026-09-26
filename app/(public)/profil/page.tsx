@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { NavigationChevron } from "@/components/ui/NavigationChevron";
+import { getPublicVillageProfile } from "@/lib/queries/village";
 
 export const metadata = {
   title: "Profil Desa Bajawali",
 };
 
-export default function ProfilIndexPage() {
+export default async function ProfilIndexPage() {
+  const profile = await getPublicVillageProfile();
   const menus = [
     { name: "Sejarah Desa", path: "/profil/sejarah", desc: "Menelusuri rekam jejak dan asal usul terbentuknya Desa Bajawali." },
     { name: "Moto & Program", path: "/profil/visi-misi", desc: "Moto desa dan lima bidang kerja pemerintahan Desa Bajawali." },
@@ -26,7 +28,8 @@ export default function ProfilIndexPage() {
             Mengenal Lebih Dekat<br/>Desa Bajawali
           </h1>
           <p className="text-ink-800 text-xl leading-relaxed">
-            Eksplorasi ragam informasi dasar, identitas, dan susunan pemerintahan yang menjadi fondasi berdirinya Desa Bajawali.
+            {profile.description ||
+              'Eksplorasi ragam informasi dasar, identitas, dan susunan pemerintahan yang menjadi fondasi berdirinya Desa Bajawali.'}
           </p>
         </div>
 

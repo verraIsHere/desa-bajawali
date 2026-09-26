@@ -1,8 +1,15 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import {desaInfo, beritaDummy, galeriDummy} from '@/data/dummy'
+import {beritaDummy, galeriDummy} from '@/data/dummy'
 import HeroCarousel from '@/components/layout/HeroCarousel'
-import { getPublicHeroSlides } from '@/lib/queries/village'
+import {
+  getPublicContactInformation,
+  getPublicHeroSlides,
+  getPublicVillageGeography,
+  getPublicVillageProfile,
+  getPublicVillageStatistics,
+  getPublicVillageStructure,
+} from '@/lib/queries/village'
 import { getPublishedGallery } from '@/lib/queries/gallery'
 import { getPublishedNews } from '@/lib/queries/news'
 import HomeScrollEffects from '@/components/animations/HomeScrollEffects'
@@ -14,39 +21,6 @@ type PerangkatDesa = {
   nama: string
   foto?: string
 }
-
-const kepalaDesa = {
-  jabatan: 'Kepala Desa',
-  nama: 'Ketut Langga, S.Ag',
-  foto: '/gambar/struktur/kepala-desa-bajawali.webp',
-}
-
-const perangkatDesa: PerangkatDesa[] = [
-  {jabatan: 'Sekretaris Desa', nama: 'Kadek Wijaya'},
-  {
-    jabatan: 'Kaur Umum dan Perencanaan',
-    nama: 'I Gede Andi Suardika',
-    foto: '/gambar/struktur/I GEDE ANDI SUARDIKA.webp',
-  },
-  {jabatan: 'Kaur Keuangan', nama: 'Andreas Stevanus H'},
-  {
-    jabatan: 'Kasi Pemerintah',
-    nama: 'I Gede Agus Puja',
-    foto: '/gambar/struktur/igede Agus puja.webp',
-  },
-  {
-    jabatan: 'Kasi Kesra & Pelayanan',
-    nama: 'Meilisa',
-    foto: '/gambar/struktur/Meilisa.webp',
-  },
-  // {
-  //   jabatan: 'Staf Kasi Kesra',
-  //   nama: 'Ni Made Pipi Saphira',
-  //   foto: '/gambar/struktur/NI MADE PIPI SAPHIRA.webp',
-  // },
-]
-
-const profilDesa = [kepalaDesa, ...perangkatDesa]
 
 const strukturImages = [
   {
@@ -93,11 +67,70 @@ const getInitials = (nama: string) =>
     .toUpperCase()
 
 export default async function Home() {
-  const [publicSlides, publicNews, publicGallery] = await Promise.all([
+  const [
+    publicSlides,
+    publicNews,
+    publicGallery,
+    profile,
+    statistics,
+    geography,
+    structure,
+    contact,
+  ] = await Promise.all([
     getPublicHeroSlides(),
     getPublishedNews(),
     getPublishedGallery(),
+    getPublicVillageProfile(),
+    getPublicVillageStatistics(),
+    getPublicVillageGeography(),
+    getPublicVillageStructure(),
+    getPublicContactInformation(),
   ])
+
+  const luasWilayah = geography.area_ha.toLocaleString('id-ID', {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+  })
+  const district = profile.district
+  const regency = profile.regency
+  const province = profile.province
+  const elevation = geography.elevation
+  const rainfall = geography.rainfall
+  const temperature = geography.temperature
+  const motto = profile.motto
+  const dataYear = profile.data_year
+
+  // Struktur pemerintahan diambil dari tabel village_officials, bukan hardcode,
+  // sehingga pergantian perangkat desa langsung terlihat di beranda.
+  const officialToPerangkat = (official: {
+    position: string
+    name: string
+    photo_url: string | null
+  }): PerangkatDesa => ({
+    jabatan: official.position,
+    nama: official.name,
+    foto: official.photo_url || undefined,
+  })
+
+  const kepalaDesaOfficial = structure.officials.find(
+    (official) => official.position === 'Kepala Desa'
+  )
+  const kepalaDesa: PerangkatDesa = kepalaDesaOfficial
+    ? officialToPerangkat(kepalaDesaOfficial)
+    : {
+        jabatan: 'Kepala Desa',
+        nama: profile.head_name,
+        foto: '/gambar/struktur/kepala-desa-bajawali.webp',
+      }
+
+  const perangkatDesa: PerangkatDesa[] = structure.officials
+    .filter(
+      (official) =>
+        official.position !== 'Kepala Desa' && official.position !== 'Kepala Dusun'
+    )
+    .map(officialToPerangkat)
+
+  const profilDesa = [kepalaDesa, ...perangkatDesa]
   const heroSlides = publicSlides
     .filter(
       (slide) =>
@@ -159,7 +192,7 @@ export default async function Home() {
           <div className="grid md:grid-cols-[220px_1fr] overflow-hidden rounded-4xl border border-paper-200 bg-paper-50">
             <div className="relative aspect-[5/6] bg-paper-200 md:aspect-auto md:min-h-[260px]">
               <Image
-                src={kepalaDesa.foto}
+                src={kepalaDesa.foto || '/gambar/struktur/kepala-desa-bajawali.webp'}
                 alt={`Foto ${kepalaDesa.nama}, Kepala Desa Bajawali`}
                 fill
                 sizes="(max-width: 768px) 100vw, 220px"
@@ -213,18 +246,17 @@ export default async function Home() {
               </h2>
               <div className="prose prose-xl prose-p:text-ink-800 prose-p:leading-relaxed max-w-none">
                 <p>
-                  Desa Bajawali berada di Kecamatan {desaInfo.kecamatan}, Kabupaten{' '}
-                  {desaInfo.kabupaten}, Provinsi {desaInfo.provinsi}. Desa Bajawali memiliki luas
-                  wilayah {desaInfo.luasWilayah} Ha dengan ketinggian {desaInfo.ketinggian} mdpl,
-                  curah hujan {desaInfo.curahHujan}, dan suhu rata-rata {desaInfo.suhu}.
+                  Desa Bajawali berada di Kecamatan {district}, Kabupaten {regency}, Provinsi{' '}
+                  {province}. Desa Bajawali memiliki luas wilayah {luasWilayah} Ha dengan ketinggian{' '}
+                  {elevation}, curah hujan {rainfall}, serta suhu {temperature}.
                 </p>
                 <p>
-                  Desa Bajawali dihuni <strong>{desaInfo.penduduk} jiwa</strong> yang tergabung
-                  dalam <strong>{desaInfo.kk} kepala keluarga</strong>, tersebar di{' '}
-                  {desaInfo.dusun} dusun dan {desaInfo.rt} RT. Nama Bajawali berasal dari kata
+                  Desa Bajawali dihuni <strong>{statistics.population} jiwa</strong> yang tergabung
+                  dalam <strong>{statistics.households} kepala keluarga</strong>, tersebar di{' '}
+                  {statistics.dusun} dusun dan {statistics.rt} RT. Nama Bajawali berasal dari kata
                   Sanskerta <strong>JAVA</strong> dan <strong>BALI</strong> yang berarti
                   &quot;Kelahiran dan Tempat Berpijak&quot;, dengan moto desa{' '}
-                  <strong>{desaInfo.moto}</strong>.
+                  <strong>{motto}</strong>.
                 </p>
               </div>
             </div>
@@ -238,7 +270,7 @@ export default async function Home() {
                 />
                 <div>
                   <div className="font-editorial text-2xl md:text-3xl text-ink-950">
-                    {desaInfo.luasWilayah} Ha
+                    {luasWilayah} Ha
                   </div>
                   <div className="mt-1 text-sm font-semibold text-ink-600">Luas wilayah</div>
                 </div>
@@ -252,7 +284,7 @@ export default async function Home() {
                 />
                 <div>
                   <div className="font-editorial text-2xl md:text-3xl text-ink-950">
-                    {desaInfo.kecamatan}
+                    {district}
                   </div>
                   <div className="mt-1 text-sm font-semibold text-ink-600">Kecamatan</div>
                 </div>
@@ -266,14 +298,14 @@ export default async function Home() {
                 />
                 <div>
                   <div className="font-editorial text-2xl md:text-3xl text-ink-950">
-                    {desaInfo.kabupaten}
+                    {regency}
                   </div>
                   <div className="mt-1 text-sm font-semibold text-ink-600">Kabupaten</div>
                 </div>
               </div>
 
               <div className="border-t border-paper-200 pt-4 text-xs text-ink-400">
-                Profil Desa {desaInfo.tahunData}
+                Profil Desa {dataYear}
               </div>
             </div>
           </div>
@@ -293,7 +325,7 @@ export default async function Home() {
               <div className="relative z-10">
                 <div className="text-sm font-semibold text-ink-600 mb-2">Penduduk</div>
                 <div className="font-editorial text-4xl md:text-5xl font-semibold text-ink-950 mb-2">
-                  {desaInfo.penduduk}
+                  {statistics.population}
                 </div>
               </div>
             </div>
@@ -306,7 +338,7 @@ export default async function Home() {
               <div className="relative z-10">
                 <div className="text-sm font-semibold text-ink-600 mb-2">Kepala Keluarga</div>
                 <div className="font-editorial text-4xl md:text-5xl font-semibold text-ink-950 mb-2">
-                  {desaInfo.kk}
+                  {statistics.households}
                 </div>
               </div>
             </div>
@@ -319,7 +351,7 @@ export default async function Home() {
               <div className="relative z-10">
                 <div className="text-sm font-semibold text-ink-600 mb-2">Dusun</div>
                 <div className="font-editorial text-4xl md:text-5xl font-semibold text-ink-950 mb-2">
-                  {desaInfo.dusun}
+                  {statistics.dusun}
                 </div>
               </div>
             </div>
@@ -332,7 +364,7 @@ export default async function Home() {
               <div className="relative z-10">
                 <div className="text-sm font-semibold text-ink-600 mb-2">RT</div>
                 <div className="font-editorial text-4xl md:text-5xl font-semibold text-ink-950 mb-2">
-                  {desaInfo.rt}
+                  {statistics.rt}
                 </div>
               </div>
             </div>
@@ -399,7 +431,7 @@ export default async function Home() {
                 Demografi
               </h3>
               <div className="font-editorial text-3xl text-ink-950 mb-2">
-                {desaInfo.penduduk} <span className="text-sm font-sans text-ink-400">Jiwa</span>
+                {statistics.population} <span className="text-sm font-sans text-ink-400">Jiwa</span>
               </div>
               <p className="text-ink-600 mb-6">
                 Data kependudukan berdasarkan jenis kelamin dan usia.
@@ -421,7 +453,7 @@ export default async function Home() {
                 Pemerintahan
               </h3>
               <div className="font-editorial text-3xl text-ink-950 mb-2">
-                Ketut Langga, S.Ag <span className="text-sm font-sans text-ink-400">Kepala Desa</span>
+                {kepalaDesa.nama} <span className="text-sm font-sans text-ink-400">Kepala Desa</span>
               </div>
               <p className="text-ink-600 mb-6">
                 Struktur organisasi pemerintahan desa, tokoh masyarakat, dan sistem pelayanan
@@ -890,19 +922,19 @@ export default async function Home() {
               <div>
                 <div className="grid grid-cols-3 gap-4 border-t border-white/20 pt-5">
                   <div>
-                    <div className="font-editorial text-2xl !text-white">{desaInfo.penduduk}</div>
+                    <div className="font-editorial text-2xl !text-white">{statistics.population}</div>
                     <div className="text-[10px] uppercase tracking-widest text-white/55 mt-1">
                       Jiwa
                     </div>
                   </div>
                   <div>
-                    <div className="font-editorial text-2xl !text-white">{desaInfo.dusun}</div>
+                    <div className="font-editorial text-2xl !text-white">{statistics.dusun}</div>
                     <div className="text-[10px] uppercase tracking-widest text-white/55 mt-1">
                       Dusun
                     </div>
                   </div>
                   <div>
-                    <div className="font-editorial text-2xl !text-white">{desaInfo.rt}</div>
+                    <div className="font-editorial text-2xl !text-white">{statistics.rt}</div>
                     <div className="text-[10px] uppercase tracking-widest text-white/55 mt-1">
                       RT
                     </div>
@@ -951,45 +983,49 @@ export default async function Home() {
                       src="/gambar/icon/lokasi.webp"
                       className="mt-0.5 h-5 w-5 shrink-0"
                     />
-                    <span>Desa Bajawali, Kec. Lariang, Kab. Pasangkayu</span>
+                    <span>{contact.address}</span>
                   </div>
                   <div className="flex items-start gap-3 text-sm text-ink-700">
                     <IconImage
                       src="/gambar/icon/jadwal_kegiatan.webp"
                       className="mt-0.5 h-5 w-5 shrink-0"
                     />
-                    <span>Senin–Jumat · 08.00–15.00 WITA</span>
+                    <span>{contact.service_hours}</span>
                   </div>
-                  <a
-                    href="mailto:desabajawali2@gmail.com"
-                    className="flex items-start gap-3 text-sm text-ink-700 transition-colors hover:text-green-700"
-                  >
-                    <IconImage
-                      src="/gambar/icon/dokumen.webp"
-                      className="mt-0.5 h-5 w-5 shrink-0"
-                    />
-                    <span>
-                      <span className="block text-xs font-semibold text-ink-400">Email</span>
-                      desabajawali2@gmail.com
-                    </span>
-                  </a>
-                  <a
-                    href="https://wa.me/+6285756063460"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-start gap-3 text-sm text-ink-700 transition-colors hover:text-green-700"
-                  >
-                    <IconImage
-                      src="/gambar/icon/kantor_desa.webp"
-                      className="mt-0.5 h-5 w-5 shrink-0"
-                    />
-                    <span>
-                      <span className="block text-xs font-semibold text-ink-400">
-                        Telepon/WhatsApp
+                  {contact.email ? (
+                    <a
+                      href={`mailto:${contact.email}`}
+                      className="flex items-start gap-3 text-sm text-ink-700 transition-colors hover:text-green-700"
+                    >
+                      <IconImage
+                        src="/gambar/icon/dokumen.webp"
+                        className="mt-0.5 h-5 w-5 shrink-0"
+                      />
+                      <span>
+                        <span className="block text-xs font-semibold text-ink-400">Email</span>
+                        {contact.email}
                       </span>
-                      +62 857-5606-3460
-                    </span>
-                  </a>
+                    </a>
+                  ) : null}
+                  {contact.whatsapp ? (
+                    <a
+                      href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-start gap-3 text-sm text-ink-700 transition-colors hover:text-green-700"
+                    >
+                      <IconImage
+                        src="/gambar/icon/kantor_desa.webp"
+                        className="mt-0.5 h-5 w-5 shrink-0"
+                      />
+                      <span>
+                        <span className="block text-xs font-semibold text-ink-400">
+                          Telepon/WhatsApp
+                        </span>
+                        {contact.whatsapp}
+                      </span>
+                    </a>
+                  ) : null}
                 </div>
                 <Link
                   href="/kontak"

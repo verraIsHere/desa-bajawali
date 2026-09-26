@@ -33,7 +33,7 @@ export default async function AdminDashboardPage() {
             <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-green-300">
               Dashboard CMS
             </div>
-            <h2 className="font-editorial text-3xl font-semibold leading-tight md:text-4xl">
+            <h2 className="font-editorial text-3xl !text-white font-semibold leading-tight md:text-4xl">
               Selamat datang, Administrator.
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/70">

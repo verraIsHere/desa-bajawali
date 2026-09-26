@@ -1,5 +1,10 @@
 import {lembagaPerekonomian, saranaDesa, mataPencaharian} from '@/data/dummy'
-import { getPublicVillageGeography, getPublicVillageStatistics } from '@/lib/queries/village'
+import {
+  getPublicVillageDemographics,
+  getPublicVillageGeography,
+  getPublicVillageStatistics,
+  getPublicVillageStructure,
+} from '@/lib/queries/village'
 import Image from 'next/image'
 import {
   KelompokUmurBarChartWrapper,
@@ -15,9 +20,11 @@ export const metadata = {
 }
 
 export default async function DataDesaPage() {
-  const [statistics, geography] = await Promise.all([
+  const [statistics, geography, demographics, structure] = await Promise.all([
     getPublicVillageStatistics(),
     getPublicVillageGeography(),
+    getPublicVillageDemographics(),
+    getPublicVillageStructure(),
   ])
   const population = statistics.population
   const households = statistics.households
@@ -28,6 +35,17 @@ export default async function DataDesaPage() {
     maximumFractionDigits: 3,
   })
   const dataYear = statistics.data_year
+
+  // Chart dan label mengikuti data demografi di Supabase, bukan angka manual.
+  const occupations =
+    demographics.occupations.length > 0
+      ? demographics.occupations.map((item) => item.label)
+      : mataPencaharian
+
+  // Kartu kepala desa mengikuti tabel village_officials.
+  const kepalaDesa = structure.officials.find(
+    (official) => official.position === 'Kepala Desa'
+  )
 
   return (
     <div className="py-12 md:py-24">
@@ -52,14 +70,17 @@ export default async function DataDesaPage() {
           <div className="w-full lg:w-[380px] flex-shrink-0 bg-paper-50 border border-paper-200 p-6 md:p-8 rounded-2xl flex flex-col items-center text-center shadow-sm">
             <div className="w-28 h-28 relative rounded-full overflow-hidden border-4 border-white shadow-sm mb-4">
               <Image
-                src="/gambar/struktur/kepala-desa-bajawali.webp"
-                alt="Kepala Desa Bajawali"
+                src={kepalaDesa?.photo_url || '/gambar/struktur/kepala-desa-bajawali.webp'}
+                alt={kepalaDesa ? `Kepala Desa ${kepalaDesa.name}` : 'Kepala Desa Bajawali'}
                 fill
+                sizes="112px"
                 className="object-cover object-top"
               />
             </div>
             <div className="mb-4">
-              <h3 className="font-editorial text-2xl text-ink-950 mb-1">Ketut Langga, S.Ag</h3>
+              <h3 className="font-editorial text-2xl text-ink-950 mb-1">
+                {kepalaDesa?.name || 'Kepala Desa Bajawali'}
+              </h3>
               <div className="text-xs font-bold uppercase tracking-widest text-green-700">
                 Kepala Desa Bajawali
               </div>
@@ -135,11 +156,11 @@ export default async function DataDesaPage() {
                   Kelompok Umur Penduduk
                 </h3>
                 <p className="text-sm text-ink-600">
-                  Distribusi usia penduduk Desa Bajawali (Profil Desa 2026)
+                  Distribusi usia penduduk Desa Bajawali (Profil Desa {dataYear})
                 </p>
               </div>
               <div className="h-[350px] w-full">
-                <KelompokUmurBarChartWrapper />
+                <KelompokUmurBarChartWrapper rows={demographics.age_groups} />
               </div>
             </div>
           </div>
@@ -160,7 +181,7 @@ export default async function DataDesaPage() {
             <div className="lg:col-span-2 border border-paper-200 p-6 md:p-8 rounded-md flex flex-col justify-center bg-paper-100">
               <h3 className="font-editorial text-3xl text-ink-950 mb-4">Mata Pencaharian Warga</h3>
               <div className="flex flex-wrap gap-2 mb-6">
-                {mataPencaharian.map((pekerjaan) => (
+                {occupations.map((pekerjaan) => (
                   <span
                     key={pekerjaan}
                     className="text-sm font-semibold text-ink-800 bg-paper-50 border border-paper-200 px-3 py-1.5 rounded-full"
@@ -187,10 +208,10 @@ export default async function DataDesaPage() {
             <div className="bg-paper-50 border border-paper-200 p-6 md:p-8 rounded-md flex flex-col">
               <div className="mb-6">
                 <h3 className="font-editorial text-2xl text-ink-950 mb-2">Kepercayaan & Agama</h3>
-                <p className="text-sm text-ink-600">Distribusi pemeluk agama (Profil Desa 2026)</p>
+                <p className="text-sm text-ink-600">Distribusi pemeluk agama (Profil Desa {dataYear})</p>
               </div>
               <div className="flex-1 h-[250px] w-full">
-                <AgamaDoughnutChartWrapper />
+                <AgamaDoughnutChartWrapper rows={demographics.religions} />
               </div>
             </div>
 
@@ -198,10 +219,10 @@ export default async function DataDesaPage() {
             <div className="bg-paper-50 border border-paper-200 p-6 md:p-8 rounded-md flex flex-col">
               <div className="mb-6">
                 <h3 className="font-editorial text-2xl text-ink-950 mb-2">Komposisi Suku</h3>
-                <p className="text-sm text-ink-600">Sebaran Suku Warga (Profil Desa 2026)</p>
+                <p className="text-sm text-ink-600">Sebaran Suku Warga (Profil Desa {dataYear})</p>
               </div>
               <div className="flex-1 h-[250px] w-full">
-                <SukuDoughnutChartWrapper />
+                <SukuDoughnutChartWrapper rows={demographics.ethnicities} />
               </div>
             </div>
 
@@ -209,10 +230,10 @@ export default async function DataDesaPage() {
             <div className="bg-paper-50 border border-paper-200 p-6 md:p-8 rounded-md flex flex-col">
               <div className="mb-6">
                 <h3 className="font-editorial text-2xl text-ink-950 mb-2">Status Pernikahan</h3>
-                <p className="text-sm text-ink-600">Kawin vs Belum Kawin (Profil Desa 2026)</p>
+                <p className="text-sm text-ink-600">Kawin vs Belum Kawin (Profil Desa {dataYear})</p>
               </div>
               <div className="flex-1 h-[250px] w-full">
-                <StatusPernikahanPieChartWrapper />
+                <StatusPernikahanPieChartWrapper rows={demographics.marital_statuses} />
               </div>
             </div>
 
@@ -220,10 +241,10 @@ export default async function DataDesaPage() {
             <div className="bg-paper-50 border border-paper-200 p-6 md:p-8 rounded-md flex flex-col">
               <div className="mb-6">
                 <h3 className="font-editorial text-2xl text-ink-950 mb-2">Distribusi Wilayah</h3>
-                <p className="text-sm text-ink-600">Sebaran Populasi per Dusun (Profil Desa 2026)</p>
+                <p className="text-sm text-ink-600">Sebaran Populasi per Dusun (Profil Desa {dataYear})</p>
               </div>
               <div className="flex-1 h-[300px] w-full">
-                <DistribusiWilayahBarChartWrapper />
+                <DistribusiWilayahBarChartWrapper rows={demographics.dusun_distribution} />
               </div>
             </div>
           </div>

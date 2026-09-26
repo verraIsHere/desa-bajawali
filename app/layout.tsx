@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import BottomNav from "@/components/layout/BottomNav";
 
 const manrope = Manrope({
   variable: "--font-ui",
@@ -32,13 +29,7 @@ export default function RootLayout({
       <body
         className={`${manrope.variable} ${sourceSerif4.variable} antialiased min-h-screen flex flex-col`}
       >
-        <Navbar />
-        {/* Main Content with Mobile Bottom Padding */}
-        <main className="flex-1 md:pb-0 pb-[72px]">
-          {children}
-        </main>
-        <Footer />
-        <BottomNav />
+        {children}
       </body>
     </html>
   );

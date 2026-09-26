@@ -1,4 +1,3 @@
-import { mataPencaharian } from "@/data/dummy";
 import { NavigationChevron } from "@/components/ui/NavigationChevron";
 import {
   getPublicVillageDemographics,
@@ -15,7 +14,9 @@ export default async function DemografiPage() {
     getPublicVillageProfile(),
     getPublicVillageStatistics(),
     getPublicVillageDemographics(),
-  ])
+  ]);
+  // Mata pencaharian diambil dari kolom occupations pada tabel demografi.
+  const mataPencaharian = demographics.occupations.map((item) => item.label);
   const ageGroups = demographics.age_groups.length > 0
     ? demographics.age_groups
     : [
@@ -56,12 +57,25 @@ export default async function DemografiPage() {
               Berdasarkan data profil tahun {statistics.data_year}, {profile.name} memiliki total penduduk sebanyak <strong>{statistics.population} jiwa</strong> yang tergabung dalam <strong>{statistics.households} Kepala Keluarga (KK)</strong>.
             </p>
             <p>
-              Penduduk tersebar di {statistics.dusun} dusun dan {statistics.rt} Rukun Tetangga (RT). Mata pencaharian warga antara lain {mataPencaharian.map((m, i) => (
-                <span key={m}>
-                  {i > 0 && i < mataPencaharian.length - 1 ? ', ' : i === mataPencaharian.length - 1 ? ', dan ' : ''}
-                  <strong>{m.toLowerCase()}</strong>
-                </span>
-              ))}, dengan sektor pertanian dan perkebunan sebagai penopang utama ekonomi wilayah.
+              Penduduk tersebar di {statistics.dusun} dusun dan {statistics.rt} Rukun Tetangga (RT).
+              {mataPencaharian.length > 0 ? (
+                <>
+                  {" "}Mata pencaharian warga antara lain{" "}
+                  {mataPencaharian.map((m, i) => (
+                    <span key={m}>
+                      {i > 0 && i < mataPencaharian.length - 1
+                        ? ", "
+                        : i === mataPencaharian.length - 1
+                          ? ", dan "
+                          : ""}
+                      <strong>{m.toLowerCase()}</strong>
+                    </span>
+                  ))}
+                  , dengan sektor pertanian dan perkebunan sebagai penopang utama ekonomi wilayah.
+                </>
+              ) : (
+                " Mayoritasاعب居民 bergerak di sektor pertanian dan perkebunan."
+              )}
             </p>
           </div>
 

@@ -772,3 +772,8 @@ Status saat ini:
 ---
 
 *Dikembangkan untuk Desa Bajawali, Lariang, Pasangkayu — oleh Universitas Muhammadiyah Mamuju, Posko Desa Bajawali.*
+
+
+<!-- 
+cek domain
+nslookup -type=ns desa-bajawali.web.id 1.1.1.1 -->
